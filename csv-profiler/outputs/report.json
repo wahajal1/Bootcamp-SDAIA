@@ -1,0 +1,15 @@
+{
+  "row_count": 4,
+  "columns": [
+    "name",
+    "age",
+    "city",
+    "salary"
+  ],
+  "missing": {
+    "name": 0,
+    "age": 0,
+    "city": 1,
+    "salary": 2
+  }
+}
