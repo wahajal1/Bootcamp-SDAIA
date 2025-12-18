@@ -16,7 +16,7 @@ def profile(
     report_name: str = typer.Option("report", "--report-name", help="Base name for outputs"),
     preview: bool = typer.Option(False, "--preview", help="Print a short summary"),
 ):
-    ...  # (see next slide for this implementation)
+    ...  
 
 if __name__ == "__main__":
     app()
