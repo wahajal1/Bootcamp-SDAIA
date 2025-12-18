@@ -30,3 +30,6 @@ The Streamlit app gives you the ability to:
 - generate a report for it
 - preview the report 
 - download the report as JSON + Markdown
+
+![Streamlit UI](./images/ui.png)
+

@@ -63,43 +63,51 @@ ar = read_csv_rows("data/sample.csv")
 
 uploaded = st.file_uploader("Upload a csv", type = ["csv"])
 preview = st.checkbox("Show preview", value = False)
-try:
-    if uploaded is not None:
-        text = uploaded.getvalue().decode("utf-8-sig")
-        rows = list(DictReader(StringIO(text)))
-        st.write("Filename:", uploaded.name)
-        st.write("Size (bytes):", uploaded.size)
+if "report" not in st.session_state:
+    try:
+        if uploaded is not None:
+            text = uploaded.getvalue().decode("utf-8-sig")
+            rows = list(DictReader(StringIO(text)))
+            st.write("Filename:", uploaded.name)
+            st.write("Size (bytes):", uploaded.size)
+            
+            if st.button("Generate Report"):
+             st.session_state["report"] = basic_profile(rows)
+        else:
+            st.info("Please upload a CSV file to proceed.")
+        report = st.session_state.get("report")
+        if report is not None: 
+            st.subheader("Markdown preview")
+            st.write("Rows:", report["row_count"])
+            st.write("Columns:", report["columns"])
+            render_markdown(report)
+            st.markdown(render_markdown(report))
         
-        if st.button("Generate Report"):
-         st.session_state["report"] = basic_profile(rows)
-    else:
-        st.info("Please upload a CSV file to proceed.")
-    report = st.session_state.get("report")
-    if report is not None: 
-        st.subheader("Markdown preview")
-        st.write("Rows:", report["row_count"])
-        st.write("Columns:", report["columns"])
-        render_markdown(report)
-        st.markdown(render_markdown(report))
-    
-    report_name = st.sidebar.text_input("Report name", value ="report")
-    json_file = report_name + ".json"
-    json_text = json.dumps(report, indent=2, ensure_ascii=False)
-    md_file = report_name +".md"
-    md_text = render_markdown(report)
-    jsoncol, mdcol = st.columns(2)
-    jsoncol.download_button("Download json", json_text, json_file)
-    mdcol.download_button("Download Markdown", md_text, md_file)
-    if st.button("save to outputs/"):
-        path = Path("outputs/")
-        path.parent.mkdir(parents = True, exist_ok = True)
-        (path/json_file).write_text(json_text, encoding = "utf-8")
-        st.success(f"Report saved to {path/json_file}")
-       
-    if preview == True: 
-        st.write(ar[:5])
-        st.write("Rows:", len(ar))
+        report_name = st.sidebar.text_input("Report name", value ="report")
+        json_file = report_name + ".json"
+        md_file = report_name +".md"
+        if report is None:
+            st.warning("Generate Report first to enable downloads.")
+            st.download_button("Download json", "{}", json_file, disabled=True)
+            st.download_button("Download Markdown", "", md_file, disabled=True)
+        else:
+            json_text = json.dumps(report, indent=2, ensure_ascii=False)
+            md_text = render_markdown(report)
 
-except Exception as E:
-    st.error(f"Error processing file: {E}")
+            jsoncol, mdcol = st.columns(2)
+            jsoncol.download_button("Download json", json_text, json_file)
+            mdcol.download_button("Download Markdown", md_text, md_file)
+        if st.button("save to outputs/"):
+            path = Path("outputs/")
+            path.parent.mkdir(parents = True, exist_ok = True)
+            (path/json_file).write_text(json_text, encoding = "utf-8")
+            st.success(f"Report saved to {path/json_file}")
+        
+        if preview == True: 
+            st.write("### Data Preview")
+            st.write(text[:5]+"\n")
+            st.write("Rows:", len(text))
+
+    except Exception as E:
+        st.error(f"Error processing file: {E}")
 
