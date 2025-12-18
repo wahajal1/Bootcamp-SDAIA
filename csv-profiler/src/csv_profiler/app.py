@@ -49,7 +49,6 @@ def render_markdown(report: dict) -> str:
         for c in cols:
             lines.append(f"- `{c}` (missing: {missing.get(c, 0)})\n")
             
-    # Join list of strings into one single string for display/download
     return "".join(lines)
 
 st.set_page_config(page_title="CSV Profiler", layout="wide")

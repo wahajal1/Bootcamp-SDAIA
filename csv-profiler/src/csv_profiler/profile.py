@@ -1,26 +1,3 @@
-def basic_profile(rows: list[dict[str, str]]) -> dict:
-    """Compute row count, column names, and missing values per column."""
-    if not rows:
-        return {
-            "row_count": 0,
-            "columns": [],
-            "missing": {},
-        }
-
-    columns = list(rows[0].keys())
-    missing = {c: 0 for c in columns}
-
-    for row in rows:
-        for c in columns:
-            v = (row.get(c) or "").strip()
-            if v == "":
-                missing[c] += 1
-
-    return {
-        "row_count": len(rows),
-        "columns": columns,
-        "missing": missing,
-    }
 
 
 def is_missing(value: str|None)->bool:
@@ -59,17 +36,47 @@ def numeric_stats(values: list[str]) -> dict:
         nums.append(x)     
     count = len(nums)
     unique = len(set(nums))
-    min = min(nums)
-    max = max(nums)
+    minv = min(nums)
+    maxv = max(nums)
     avg = sum(nums)/count
     report = {
           "count: ": count,
           "unique values:": unique,
-          "minmum value:": min,
-          "maximum value:": max,
+          "missing": missing,
+          "minmum value:": minv,
+          "maximum value:": maxv,
           "average:": avg
       }
     return report
+from collections import Counter
+
+def is_missing(v: str | None) -> bool:
+    return v is None or str(v).strip() == ""
+
+def basic_profile(rows: list[dict[str, str]]) -> dict:
+    """Basic profiling: row/col counts, missing per column, unique per column."""
+    if not rows:
+        return {"n_rows": 0, "n_cols": 0, "columns": []}
+
+    columns = list(rows[0].keys())
+    n_rows = len(rows)
+
+    col_reports: list[dict] = []
+    for col in columns:
+        values = [r.get(col, "") for r in rows]
+        usable = [v for v in values if not is_missing(v)]
+        missing = len(values) - len(usable)
+
+        report = {
+            "name": col,
+            "missing": missing,
+            "missing_pct": (missing / n_rows * 100.0) if n_rows else 0.0,
+            "unique": len(set(usable)),
+        }
+        col_reports.append(report)
+
+    return {"n_rows": n_rows, "n_cols": len(columns), "columns": col_reports}
+
 numeric_stats(["1", "2", "3", "4", "5"])
 
 # def text_stats(values: list[str], top_k: int = 5) -> dict:
