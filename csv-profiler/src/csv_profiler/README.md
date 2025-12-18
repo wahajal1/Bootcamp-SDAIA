@@ -31,5 +31,5 @@ The Streamlit app gives you the ability to:
 - preview the report 
 - download the report as JSON + Markdown
 
-![Streamlit UI](./images/ui.png)
+![Streamlit UI](./images/img.png)
 
