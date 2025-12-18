@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from datetime import datetime
 
 def write_json(report: dict, path: str | Path) -> None:
     path = Path(path)
